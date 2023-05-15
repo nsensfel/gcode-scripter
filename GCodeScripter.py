@@ -301,6 +301,10 @@ if __name__ == "__main__":
 
       gcode_scripter.set_gcode_parser(gcode_parser_class())
 
+   if (parsed_arguments.input_file is not None):
+      with open(parsed_arguments.input_file[0]) as input_file:
+         gcode_scripter.set_gcode(input_file.readlines())
+
    if (parsed_arguments.execute is not None):
       run_scripts(
          gcode_scripter,
