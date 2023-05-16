@@ -1,4 +1,4 @@
-class NoGCodeInterpretation:
+class GCodeParser:
    def reset (self):
       self.index = 0
 
@@ -18,6 +18,9 @@ class NoGCodeInterpretation:
 
    def get_index (self):
       return self.index
+
+   def get_gcode_length (self):
+      return len(self.gcode)
 
    def get_previous_raw_gcode (self):
       return self.gcode[self.index - 1]

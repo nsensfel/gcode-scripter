@@ -1,4 +1,4 @@
-class GenericPrinter:
+class Printer:
 
    def reset (self):
       self.bed_temperature = 0
@@ -10,6 +10,7 @@ class GenericPrinter:
       self.print_area_size_x = 0
       self.print_area_size_y = 0
       self.print_area_size_z = 0
+      self.print_fan_speed = 0
       self.is_extruding = False
       self.is_using_relative_coordinates = False
       self.script_tags = dict()
@@ -89,6 +90,12 @@ class GenericPrinter:
 
    def get_print_area_size_z (self):
       return self.print_area_size_z
+
+   def set_print_fan_speed (self, value):
+      self.print_fan_speed = value
+
+   def get_print_fan_speed (self):
+      return self.print_fan_speed
 
    def set_is_extruding (self, value):
       self.is_extruding = value

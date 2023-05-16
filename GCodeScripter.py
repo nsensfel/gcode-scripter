@@ -1,18 +1,95 @@
 #!/bin/env python3
+import importlib
+import os
 
-from gcode_parser.NoGCodeInterpretation import NoGCodeInterpretation
-from printer.GenericPrinter import GenericPrinter
-from script.NoScript import NoScript
+from gcode_parser.GCodeParser import GCodeParser
+from printer.Printer import Printer
+from script.Script import Script
+
+from ConsoleOut import ConsoleOut
+
+################################################################################
+#### LIBRARY ###################################################################
+################################################################################
 
 class GCodeScripter:
+   GCODE_PARSER_CLASS_FOLDERS = ['', 'gcode_parser.']
+   SCRIPT_CLASS_FOLDERS = ['', 'script.']
+   PRINTER_CLASS_FOLDERS = ['', 'printer.']
 
+   #### STATIC #################################################################
+   def extract_class_name (name):
+      if (name.endswith(".py")):
+         name = name[:-len(".py")]
+      try:
+         return name[(name.rindex(".") + 1):]
+      except Exception:
+         return name
+
+   def load_class (name, folder_list, parent_class, silent_fail = False):
+      failed_module_paths = []
+      failed_classes = []
+
+      result = None
+
+      for folder in folder_list:
+         try:
+            imported_module = importlib.import_module(folder + name)
+         except Exception as e:
+            failed_module_paths.append(((folder + name), e))
+            continue
+
+         try:
+            result = (
+               getattr(
+                  imported_module,
+                  GCodeScripter.extract_class_name(name)
+               )
+            )
+         except Exception as e:
+            failed_classes.append(((folder + name), e))
+            continue
+
+         if (result is None):
+            failed_classes.append(((folder + name), e))
+         elif (not issubclass(result, parent_class)):
+            failed_classes.append(
+               (
+                  (folder + name),
+                  ("Not a subclass of " + str(parent_class))
+               )
+            )
+         else:
+            return result
+
+      if (silent_fail):
+         return None
+
+      error = "Could not find class \"" + name + "\":"
+
+      for failed_module_path in failed_module_paths:
+         (path, err) = failed_module_path
+         error += "\n- Could not load a module from \"" + path + "\": "
+         error +=  str(err) + "."
+
+      for failed_class in failed_classes:
+         (path, err) = failed_class
+         error += "\n- Could not load a class from \"" + path + "\": "
+         error += str(err) + "."
+
+      ConsoleOut.error(error)
+
+      return None
+
+   def load_script_classes (name):
+      #if (os.path.exists(name)):
+      a = 0
+      return []
+
+   #############################################################################
    def __init__ (self):
-      self.gcode_parser = NoGCodeInterpretation()
-      self.printer = GenericPrinter()
-      self.script = NoScript()
-
-   def set_script (self, script):
-      self.script = script
+      self.gcode_parser = GCodeParser()
+      self.printer = Printer()
 
    def set_gcode (self, gcode):
       self.gcode_parser.parse(gcode)
@@ -22,6 +99,7 @@ class GCodeScripter:
 
    def set_gcode_parser (self, gcode_parser):
       gcode_parser.parse(self.gcode_parser.get_raw_gcode_instruction_list())
+
       self.gcode_parser = gcode_parser
 
    def set_printer (self, printer):
@@ -31,35 +109,61 @@ class GCodeScripter:
       self.gcode_parser.reset()
       self.printer.reset()
 
-   def process (self):
-      self.script.initial_state(self.gcode_parser, self.printer)
+   def execute (self, script):
+      if (isinstance(script, list)):
+         for element in script:
+            self.execute(element)
 
-      while (not self.gcode_parser.completed()):
-         previous_printer = self.printer.clone()
+         return
+      elif (isinstance(script, str)):
+         self.execute(GCodeScripter.load_script_classes(script))
 
-         self.gcode_parser.step(self.printer)
-         self.script.step(
-            previous_printer,
-            self.gcode_parser,
-            self.printer
+      elif (not issubclass(script, Script)):
+         ConsoleOut.error(
+            "Cannot execute \""
+            + str(script)
+            + "\". It is not a subclass of Script."
          )
+         return
 
-      self.script.final_state(self.gcode_parser, self.printer)
+      while True:
+         script.initial_state(self.gcode_parser, self.printer)
+
+         while (not self.gcode_parser.completed()):
+            ConsoleOut.set_progress(
+               self.gcode_parser.get_index() + 1,
+               self.gcode_parser.get_gcode_length()
+            )
+
+            if (script.uses_previous_printer()):
+               previous_printer = self.printer.clone()
+            else:
+               previous_printer = None
+
+            self.gcode_parser.step(self.printer)
+
+            script.step(
+               previous_printer,
+               self.gcode_parser,
+               self.printer.clone()
+            )
+
+         ConsoleOut.set_progress(
+            self.gcode_parser.get_index() + 1,
+            self.gcode_parser.get_gcode_length()
+         )
+         script.final_state(self.gcode_parser, self.printer)
+         self.reset()
+
+         if (not script.is_requesting_rerun()):
+            break
 
 ################################################################################
 #### SCRIPT MODE ###############################################################
 ################################################################################
 if __name__ == "__main__":
    import argparse
-   import os
 
-   def extract_class_name (name):
-      if (name.endswith(".py")):
-         name = name[:-len(".py")]
-      try:
-         return name[(name.rindex(".") + 1):]
-      except Exception:
-         return name
 
    #def load_module ():
 
@@ -164,138 +268,26 @@ if __name__ == "__main__":
 
    gcode_scripter = GCodeScripter()
 
-   def script_name_to_script_class (script_name):
-      script_module = None
-
-      while True:
-         try:
-            script_module = importlib.import_module(script_name)
-         except Exception:
-            a = 0
-
-         if (script_module is not None):
-            break
-
-         try:
-            script_module = importlib.import_module("script." + script_name)
-         except Exception:
-            a = 0
-
-         if (script_module is not None):
-            break
-
-         print("[E] Could not find script module \"" + script_name + "\".")
-         break
-
-      return getattr(
-         script_module,
-         extract_class_name(script_name)
-      )
-
-   def argument_to_script_list (argument):
-      result = []
-
-      #if (script is dir):
-      #  get_py_file_list, sort, run_scripts(gcode_scripter)
-
-      for script_name in argument:
-         if (os.path.exists(script_name)):
-            result.append(script_name)
-         elif (os.path.exists(script_name + ".py")):
-            result.append(script_name)
-         elif (os.path.exists("script" + os.path.sep + script_name)):
-            result.append("script." + script_name[:-len(".py")])
-         elif (os.path.exists("script" + os.path.sep + script_name + ".py")):
-            result.append("script." + script_name)
-         else:
-            print("[E] Could not find script path \"" + script_name + "\".")
-
-      return result
-
-
-   def run_scripts (gcode_scripter, script_class_list):
-      for script in script_class_list:
-         gcode_scripter.set_script(script())
-         gcode_scripter.process()
-         gcode_scripter.reset()
+   if (parsed_arguments.output_file is not None):
+      ConsoleOut.set_log_file(parsed_arguments.output_file[0] + ".log")
 
    if (parsed_arguments.virtual_printer is not None):
-      import importlib
-
-      printer_module = None
-
-      while True:
-         try:
-            printer_module = (
-               importlib.import_module(parsed_arguments.virtual_printer[0])
-            )
-         except Exception:
-            a = 0
-
-         if (printer_module is not None):
-            break
-
-         try:
-            printer_module = (
-               importlib.import_module(
-                  "printer."
-                  + parsed_arguments.virtual_printer[0]
-               )
-            )
-         except Exception:
-            a = 0
-
-         if (printer_module is not None):
-            break
-
-         print("[E] Could not find printer.")
-         break
-
       printer_class = (
-         getattr(
-            printer_module,
-            extract_class_name(parsed_arguments.virtual_printer[0])
+         GCodeScripter.load_class(
+            parsed_arguments.virtual_printer[0],
+            GCodeScripter.PRINTER_CLASS_FOLDERS,
+            Printer
          )
       )
 
       gcode_scripter.set_printer(printer_class())
 
    if (parsed_arguments.gcode_parser is not None):
-      import importlib
-
-      gcode_parser_module = None
-
-      while True:
-         try:
-            gcode_parser_module = (
-               importlib.import_module(parsed_arguments.gcode_parser[0])
-            )
-         except Exception:
-            a = 0
-
-         if (gcode_parser_module is not None):
-            break
-
-         try:
-            gcode_parser_module = (
-               importlib.import_module(
-                  "gcode_parser."
-                  + parsed_arguments.gcode_parser[0]
-               )
-            )
-         except Exception:
-            a = 0
-
-         if (gcode_parser_module is not None):
-            break
-
-         print("[E] Could not find gcode_parser.")
-         break
-
       gcode_parser_class = (
-         getattr(
-            gcode_parser_module,
-            extract_class_name(parsed_arguments.gcode_parser[0])
+         GCodeScripter.load_class(
+            parsed_arguments.gcode_parser[0],
+            GCodeScripter.GCODE_PARSER_CLASS_FOLDERS,
+            GCodeParser
          )
       )
 
@@ -306,14 +298,10 @@ if __name__ == "__main__":
          gcode_scripter.set_gcode(input_file.readlines())
 
    if (parsed_arguments.execute is not None):
-      run_scripts(
-         gcode_scripter,
-         [
-            script_name_to_script_class(script_name)
-            for script_name in argument_to_script_list(parsed_arguments.execute)
-         ]
-      )
+      gcode_scripter.execute(parsed_arguments.execute)
 
    if (parsed_arguments.output_file is not None):
       with open(parsed_arguments.output_file[0], 'w') as output_file:
          output_file.writelines(gcode_scripter.get_gcode())
+
+   ConsoleOut.close()
