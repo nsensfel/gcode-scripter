@@ -21,7 +21,7 @@ class ConsoleOut:
 
    def set_progress (index, max_val):
       ConsoleOut.progress_index = index
-      ConsoleOut.progress_max_val = progress_max
+      ConsoleOut.progress_max = max_val
 
    def enable_debug_messages ():
       ConsoleOut.enable_debug_messages = True
@@ -48,9 +48,9 @@ class ConsoleOut:
          message = (
             tag
             + "[GCODE: "
-            + ConsoleOut.progress_index
+            + str(ConsoleOut.progress_index)
             + "/"
-            + ConsoleOut.progress_max
+            + str(ConsoleOut.progress_max)
             + "] "
             + message
          )

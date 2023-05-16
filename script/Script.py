@@ -1,19 +1,24 @@
+from ConsoleOut import ConsoleOut
+
 class Script:
 
    def __init__ (self):
       self.step_counter = 0
 
    def initial_state (self, gcode_parser, printer):
-      print("Running Script - Initial State")
+      ConsoleOut.standard("Running Script - Initial State")
 
    def final_state (self, gcode_parser, printer):
-      print(
+      ConsoleOut.standard(
          "Running Script - Final State after "
          + str(self.step_counter)
          + " step(s)."
       )
 
-   def is_requesting_rerun ():
+   def is_requesting_rerun (self):
+      return False
+
+   def uses_previous_printer (self):
       return False
 
    def step (self, previous_printer, gcode_parser, new_printer):

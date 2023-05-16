@@ -19,8 +19,11 @@ class GCodeScripter:
 
    #### STATIC #################################################################
    def extract_class_name (name):
+      name = name.replace(os.sep, ".")
+
       if (name.endswith(".py")):
          name = name[:-len(".py")]
+
       try:
          return name[(name.rindex(".") + 1):]
       except Exception:
@@ -82,9 +85,51 @@ class GCodeScripter:
       return None
 
    def load_script_classes (name):
-      #if (os.path.exists(name)):
-      a = 0
-      return []
+      result = (
+         GCodeScripter.load_class(
+            name,
+            GCodeScripter.SCRIPT_CLASS_FOLDERS,
+            Script,
+            silent_fail = True
+         )
+      )
+
+      if (result is not None):
+         return [result]
+
+      for folder in GCodeScripter.SCRIPT_CLASS_FOLDERS:
+         for option in [(folder + name), (folder + name + ".py")]:
+            if (os.path.exists(option)):
+               if (os.path.isfile(option)):
+                  return [
+                     GCodeScripter.load_class(
+                        option,
+                        GCodeScripter.SCRIPT_CLASS_FOLDERS,
+                        Script
+                     )
+                  ]
+               else:
+                  candidates = [
+                     option + os.sep + filename
+                     for filename in os.listdir(option)
+                  ]
+
+                  candidates = (
+                     filter(
+                        lambda filename : (
+                           filename.endswith(".py")
+                           or not os.path.isfile(filename)
+                        ),
+                        candidates
+                     )
+                  )
+
+                  candidates.sort()
+
+                  return [
+                     load_script_classes(candidate)
+                     for candidate in candidates
+                  ]
 
    #############################################################################
    def __init__ (self):
@@ -115,8 +160,11 @@ class GCodeScripter:
             self.execute(element)
 
          return
+
       elif (isinstance(script, str)):
          self.execute(GCodeScripter.load_script_classes(script))
+
+         return
 
       elif (not issubclass(script, Script)):
          ConsoleOut.error(
@@ -125,6 +173,8 @@ class GCodeScripter:
             + "\". It is not a subclass of Script."
          )
          return
+
+      script = script()
 
       while True:
          script.initial_state(self.gcode_parser, self.printer)
@@ -149,7 +199,7 @@ class GCodeScripter:
             )
 
          ConsoleOut.set_progress(
-            self.gcode_parser.get_index() + 1,
+            self.gcode_parser.get_index(),
             self.gcode_parser.get_gcode_length()
          )
          script.final_state(self.gcode_parser, self.printer)

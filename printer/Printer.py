@@ -19,7 +19,7 @@ class Printer:
       self.reset()
 
    def clone (self):
-      result = GenericPrinter()
+      result = Printer()
 
       result.bed_temperature = self.bed_temperature
       result.hotend_temperature = self.hotend_temperature
@@ -30,6 +30,7 @@ class Printer:
       result.print_area_size_x = self.print_area_size_x
       result.print_area_size_y = self.print_area_size_y
       result.print_area_size_z = self.print_area_size_z
+      result.print_fan_speed = self.print_fan_speed = 0
       result.is_extruding = self.is_extruding
       result.is_using_relative_coordinates = self.is_using_relative_coordinates
       # deepcopy is not needed here.
