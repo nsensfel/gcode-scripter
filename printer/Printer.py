@@ -1,5 +1,9 @@
-class Printer:
+class TagCollection:
+   def __init__ (self):
+      self.collection = dict()
 
+
+class Printer:
    def reset (self):
       self.bed_temperature = 0
       self.hotend_temperature = 0
@@ -12,7 +16,7 @@ class Printer:
       self.print_area_size_z = 0
       self.print_fan_speed = 0
       self.is_extruding = False
-      self.is_using_relative_coordinates = False
+      self.is_using_relative_positioning = False
       self.script_tags = dict()
 
    def __init__ (self):
@@ -32,7 +36,7 @@ class Printer:
       result.print_area_size_z = self.print_area_size_z
       result.print_fan_speed = self.print_fan_speed = 0
       result.is_extruding = self.is_extruding
-      result.is_using_relative_coordinates = self.is_using_relative_coordinates
+      result.is_using_relative_positioning = self.is_using_relative_positioning
       # deepcopy is not needed here.
       result.script_tags = self.script_tags.copy()
 

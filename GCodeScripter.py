@@ -177,6 +177,11 @@ class GCodeScripter:
       script = script()
 
       while True:
+         ConsoleOut.set_progress(
+            self.gcode_parser.get_index(),
+            self.gcode_parser.get_gcode_length()
+         )
+
          script.initial_state(self.gcode_parser, self.printer)
 
          while (not self.gcode_parser.completed()):
