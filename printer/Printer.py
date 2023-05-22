@@ -1,7 +1,60 @@
-class TagCollection:
-   def __init__ (self):
-      self.collection = dict()
+class TagCollection (dict):
+   def handle_text_instruction (self, text):
+      instruction = text.split(" ")
 
+      if (len(instruction) < 2):
+         ConsoleOut.error("Invalid TagCollection instruction \"" + text + "\".")
+         return
+      elif (instruction[1] == "set"):
+         self[instruction[0]] = (
+            instruction[2] if (len(instruction) == 3) else True
+         )
+         return
+      elif (instruction[1] == "start_list"):
+         self[instruction[0]] = (
+            [instruction[2]] if (len(instruction) == 3) else []
+         )
+         return
+      elif (instruction[1] == "unset"):
+         del self[instruction[0]]
+         return
+
+      if (len(instruction) < 3):
+         ConsoleOut.error(
+            "Missing argument in TagCollection instruction \""
+            + text
+            + "\"."
+         )
+         return
+
+      if (instruction[1] == "+="):
+         self[instruction[0]] = int(self[instruction[0]]) + int(instruction[2])
+      elif (instruction[1] == "-="):
+         self[instruction[0]] = int(self[instruction[0]]) - int(instruction[2])
+      elif (instruction[1] == "f+="):
+         self[instruction[0]] = (
+            float(self[instruction[0]])
+            + float(instruction[2])
+         )
+      elif (instruction[1] == "f-="):
+         self[instruction[0]] = (
+            float(self[instruction[0]])
+            - float(instruction[2])
+         )
+      elif (instruction[1] == "add"):
+         self[instruction[0]].append(instruction[2])
+      elif (instruction[1] == "remove"):
+         self[instruction[0]].remove(instruction[2])
+      elif (instruction[1] == "remove_all"):
+         while (instruction[2] in self[instruction[0]]):
+            self[instruction[0]].remove(instruction[2])
+      else:
+         ConsoleOut.error(
+            "Unknown operation in TagCollection instruction \""
+            + text
+            + "\"."
+         )
+         return
 
 class Printer:
    def reset (self):
@@ -17,9 +70,10 @@ class Printer:
       self.print_fan_speed = 0
       self.is_extruding = False
       self.is_using_relative_positioning = False
-      self.script_tags = dict()
+      self.temporary_tags = TagCollection()
 
    def __init__ (self):
+      self.permanent_tags = TagCollection()
       self.reset()
 
    def clone (self):
@@ -37,8 +91,8 @@ class Printer:
       result.print_fan_speed = self.print_fan_speed = 0
       result.is_extruding = self.is_extruding
       result.is_using_relative_positioning = self.is_using_relative_positioning
-      # deepcopy is not needed here.
-      result.script_tags = self.script_tags.copy()
+      result.temporary_tags = self.temporary_tags.deepcopy()
+      result.permanent_tags = self.permanent_tags.deepcopy()
 
       return result
 
@@ -114,8 +168,7 @@ class Printer:
    def is_using_relative_positioning (self):
       return self.is_using_relative_positioning
 
-   def set_location (self, location):
-      (x, y, z) = location
+   def set_location (self, x, y, z):
       self.location_x = x
       self.location_y = y
       self.location_z = z
@@ -140,14 +193,20 @@ class Printer:
          self.location_z
       )
 
-   def add_script_tag (self, name, value = 1):
-      self.script_tags[name] = value
+   def get_permanent_tag (self, name):
+      return self.permanent_tags[name]
 
-   def remove_script_tag (self, name):
-      del self.script_tags[name]
+   def has_permanent_tag (self, name):
+      return (name in self.permanent_tags)
 
-   def has_script_tag (self, name):
-      return (name in self.script_tags)
+   def interpret_permanent_tag_instruction (self, instr):
+      self.permanent_tags.handle_text_instruction(instr)
 
-   def get_script_tag (self, name):
-      return self.script_tags[name]
+   def get_temporary_tag (self, name):
+      return self.temporary_tags[name]
+
+   def has_temporary_tag (self, name):
+      return (name in self.temporary_tags)
+
+   def interpret_temporary_tag_instruction (self, instr):
+      self.temporary_tags.handle_text_instruction(instr)
