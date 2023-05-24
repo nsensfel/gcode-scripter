@@ -123,6 +123,10 @@ class GCodeParser:
    def M17_gcode (self, parameters, comment, printer):
       a = 0
 
+   # Disable All Stepper Motors
+   def M18_gcode (self, parameters, comment, printer):
+      a = 0
+
    # List SD Card
    def M20_gcode (self, parameters, comment, printer):
       a = 0
@@ -141,6 +145,10 @@ class GCodeParser:
 
    # Start/Resume SD Print
    def M24_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Pause SD Print
+   def M25_gcode (self, parameters, comment, printer):
       a = 0
 
    # Set SD Position
@@ -199,6 +207,38 @@ class GCodeParser:
    def M73_gcode (self, parameters, comment, printer):
       a = 0
 
+   # ATX Power On
+   def M80_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # ATX Power Off
+   def M81_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set Extruder to Absolute Mode
+   def M82_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set Extruder to Relative Mode
+   def M83_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Stop Idle Hold
+   def M84_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set Inactivity Shutdown Timer
+   def M85_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set Safety Timer Expiration Time
+   def M86_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set axis_steps_per_unit
+   def M92_gcode (self, parameters, comment, printer):
+      a = 0
+
    # Set Extruder Temperature
    def M104_gcode (self, parameters, comment, printer):
       param = GCodeParser.split_basic_gcode_parameters(parameter)
@@ -210,8 +250,75 @@ class GCodeParser:
    def M105_gcode (self, parameters, comment, printer):
       a = 0
 
+   # Fan On
+   def M106_gcode (self, parameters, comment, printer):
+      param = GCodeParser.split_basic_gcode_parameters(parameter)
+
+      if ('S' in param):
+         printer.set_print_fan_speed(int(param['S']))
+      else:
+         printer.set_print_fan_speed(255)
+
+   # Fan Off
+   def M107_gcode (self, parameters, comment, printer):
+      printer.set_print_fan_speed(0)
+
+   # Set Extruder Temperature and Wait
+   def M109_gcode (self, parameters, comment, printer):
+      param = GCodeParser.split_basic_gcode_parameters(parameter)
+
+      if ('R' in param):
+         printer.set_hotend_temperature(int(param['S']))
+      elif (('B' in param) and ('S' in param)):
+         printer.set_hotend_temperature(int(param['B']))
+      elif ('S' in param):
+         printer.set_hotend_temperature(int(param['S']))
+
+   # Set Current Line Number
+   def M110_gcode (self, parameters, comment, printer):
+      param = GCodeParser.split_basic_gcode_parameters(parameter)
+
+      # Will be incremented right after handling.
+      self.line = int(param['S']) - 1
+
    # Full (Emergency) Stop
    def M112_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Host Keepalive
+   def M113_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Get Current Position
+   def M114_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Get Firmware Version and Capabilities
+   def M115_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Display Message
+   def M117_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Get Endstop Status
+   def M119_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Enable Endstop Detection
+   def M120_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Disable Endstop Detection
+   def M121_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Tachometer Value
+   def M123_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Pause Print
+   def M125_gcode (self, parameters, comment, printer):
       a = 0
 
    # Set Bed Temperation (Fast)
@@ -220,6 +327,167 @@ class GCodeParser:
 
       if ('S' in param):
          printer.set_bed_temperature(int(param['S']))
+
+   # Set LED Color
+   def M150_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Automatically Send Temperatures
+   def M155_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set Bed Temperature and Wait
+   def M190_gcode (self, parameters, comment, printer):
+      param = GCodeParser.split_basic_gcode_parameters(parameter)
+
+      if ('R' in param):
+         printer.set_bed_temperature(int(param['S']))
+      elif ('S' in param):
+         printer.set_bed_temperature(int(param['S']))
+
+   # Set Filament Diameter
+   def M200_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set Max Printing Acceleration
+   def M201_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set Max Feedrate
+   def M203_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set Default Acceleration
+   def M204_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Advanced Settings
+   def M205_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Offset Axes
+   def M206_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set Retract Length
+   def M207_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set Unretract Length
+   def M208_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Enable Automatic Retract
+   def M209_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set Hotend Offset
+   def M218_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set Speed Factor Override Percentage
+   def M220_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set Extrude Factor Override Percentage
+   def M221_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Wait for Pin State
+   def M226_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Trigger Camera
+   def M240_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set Servo Position
+   def M280_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Play Beep Sound
+   def M300_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set PID Parameters
+   def M301_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Allow Cold Extrudes
+   def M302_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Run PID Tuning
+   def M303_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set PID Parameters - Bed
+   def M304_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Wait for Current Moves to Finish
+   def M400_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set Filament Type (Material) for Particular Extruder and Notify the MMU
+   def M403_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Store Parameters in Non-Volatile Storage
+   def M500_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Read Parameters from EEPROM
+   def M501_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Restore Default Settings
+   def M502_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Report Current Settings
+   def M503_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Force Language Selection
+   def M509_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Enable/Disable "Stop SD Print on Endstop Hit"
+   def M540_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Filament Change Pause
+   def M600_gcode (self, parameters, comment, printer):
+      a = 0
+      # Assuming here that the parameters do not affect the location once the
+      # command is completed.
+
+   # Filament Change Pause
+   def M601_gcode (self, parameters, comment, printer):
+      a = 0
+      # Assuming here that the parameters do not affect the location once the
+      # command is completed.
+
+   # Resume Print
+   def M602_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Stop Print
+   def M603_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set Z-Probe Offset
+   def M851_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Wait For Probe Temperature
+   def M860_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set Probe Thermal Compensation
+   def M861_gcode (self, parameters, comment, printer):
+      a = 0
 
    # Start SD Logging
    def M928_gcode (self, parameters, comment, printer):
