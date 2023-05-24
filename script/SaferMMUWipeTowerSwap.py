@@ -27,7 +27,6 @@ class SaferMMUWipeTowerSwap (Script):
                ),
                offset = 1
             )
-            self.ignore_next_filament_swap = True
             return
 
          inserted_gcode_list = []
@@ -93,7 +92,7 @@ class SaferMMUWipeTowerSwap (Script):
 
          gcode_parser.insert_raw_gcode_after(inserted_gcode_list)
 
-         ConsoleOut.standard("Handled a tool change.")
+         ConsoleOut.standard("Handled a tool change (\"" + gcode_line + "\").")
 
          self.replaced_swaps += 1
 
