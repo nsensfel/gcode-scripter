@@ -425,6 +425,14 @@ class GCodeParser:
    def M304_gcode (self, parameters, comment, printer):
       a = 0
 
+   # Set Microstepping Mode
+   def M350_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Toggle MS1 MS2 Pins Directly
+   def M350_gcode (self, parameters, comment, printer):
+      a = 0
+
    # Wait for Current Moves to Finish
    def M400_gcode (self, parameters, comment, printer):
       a = 0
@@ -477,6 +485,14 @@ class GCodeParser:
    def M603_gcode (self, parameters, comment, printer):
       a = 0
 
+   # Load Filament
+   def M701_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Unload Filament
+   def M702_gcode (self, parameters, comment, printer):
+      a = 0
+
    # Set Z-Probe Offset
    def M851_gcode (self, parameters, comment, printer):
       a = 0
@@ -489,6 +505,58 @@ class GCodeParser:
    def M861_gcode (self, parameters, comment, printer):
       a = 0
 
+   # Print Checking
+   def M861_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set Linear Advance Scaling Factors
+   def M900_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set Digital Trimpot Motor
+   def M907_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Control Digital Trimpot Directly
+   def M908_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # TMC2130 Init
+   def M910_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set TMC2130 Holding Currents
+   def M911_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set TMC2130 Running Currents
+   def M912_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Print TMC2130 Currents
+   def M913_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set TMC2130 Normal Mode
+   def M914_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set TMC2130 Silent Mode
+   def M915_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set TMC2130 Stallguard Sensitivity Threshold
+   def M916_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set TMC2130 PWM Amplitude Offset
+   def M917_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set TMC2130 PWM Amplitude Gradient
+   def M918_gcode (self, parameters, comment, printer):
+      a = 0
+
    # Start SD Logging
    def M928_gcode (self, parameters, comment, printer):
       a = 0
@@ -496,6 +564,134 @@ class GCodeParser:
    ##### Special Handlers ######################################################
    def PRUSA_gcode (self, parameters, comment, printer):
       # TODO
+      a = 0
+
+   ##### T-Code Handlers #######################################################
+
+   # Select Tool 0
+   def T0_gcode (self, parameters, comment, printer):
+      printer.set_active_tool(0)
+
+   # Select Tool 1
+   def T1_gcode (self, parameters, comment, printer):
+      printer.set_active_tool(1)
+
+   # Select Tool 2
+   def T2_gcode (self, parameters, comment, printer):
+      printer.set_active_tool(2)
+
+   # Select Tool 3
+   def T3_gcode (self, parameters, comment, printer):
+      printer.set_active_tool(3)
+
+   # Select Tool 4
+   def T4_gcode (self, parameters, comment, printer):
+      printer.set_active_tool(4)
+
+   # Select Tool 5
+   def T5_gcode (self, parameters, comment, printer):
+      printer.set_active_tool(5)
+
+   # Select Tool 6
+   def T6_gcode (self, parameters, comment, printer):
+      printer.set_active_tool(6)
+
+   # Select Tool 7
+   def T7_gcode (self, parameters, comment, printer):
+      printer.set_active_tool(7)
+
+   # Select Tool 8
+   def T8_gcode (self, parameters, comment, printer):
+      printer.set_active_tool(8)
+
+   # Select Tool 9
+   def T9_gcode (self, parameters, comment, printer):
+      printer.set_active_tool(9)
+
+   # Make User Select Tool on GUI
+   def T_QUESTION_MARK_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Make User Select Tool on GUI, then Load Filament From MMU to Extruder
+   def Tx_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Load Filament from Extruder to Nozzle
+   def Tc_gcode (self, parameters, comment, printer):
+      a = 0
+
+   ##### D-Code Handlers #######################################################
+   # Endless Loop
+   def D_MINUS_1_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Reset
+   def D0_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Clear EEPROM and Reset
+   def D1_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Read/Write RAM
+   def D2_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Read/Write EEPROM
+   def D3_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Read/Write PIN
+   def D4_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Read/Write Flash
+   def D5_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Read/Write External Flash
+   def D6_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Read/Write Bootloader
+   def D7_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Read/Write PINDA
+   def D8_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Read ADC
+   def D9_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Set XYZ Calibration = OK
+   def D10_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Write Time to Log File
+   def D12_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Check Bed and Write to SD Card File "mesh.txt"
+   def D80_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Bed Analysis, stored to SD Card File "wldsd.txt"
+   def D81_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Print Measured Fan Speed for Different PWM Values
+   def D106_gcode (self, parameters, comment, printer):
+      a = 0
+
+   # Trinamic Stepper Controller
+   def D2130_gcode (self, parameters, comment, printer):
+      # FIXME: syntax might break parsing.
+      a = 0
+
+   # PAT9125 Filament Sensor
+   def D9125_gcode (self, parameters, comment, printer):
       a = 0
 
    ##### G-Code Handlers #######################################################
@@ -726,3 +922,146 @@ GCodeParser.GCODE_HANDLER['G98'] = GCodeParser.G98_gcode
 GCodeParser.GCODE_HANDLER['G99'] = GCodeParser.G99_gcode
 
 ######## M-Code Handlers #######################################################
+GCodeParser.GCODE_HANDLER['M17'] = GCodeParser.M17_gcode
+GCodeParser.GCODE_HANDLER['M18'] = GCodeParser.M18_gcode
+GCodeParser.GCODE_HANDLER['M20'] = GCodeParser.M20_gcode
+GCodeParser.GCODE_HANDLER['M21'] = GCodeParser.M21_gcode
+GCodeParser.GCODE_HANDLER['M22'] = GCodeParser.M22_gcode
+GCodeParser.GCODE_HANDLER['M23'] = GCodeParser.M23_gcode
+GCodeParser.GCODE_HANDLER['M24'] = GCodeParser.M24_gcode
+GCodeParser.GCODE_HANDLER['M25'] = GCodeParser.M25_gcode
+GCodeParser.GCODE_HANDLER['M26'] = GCodeParser.M26_gcode
+GCodeParser.GCODE_HANDLER['M27'] = GCodeParser.M27_gcode
+GCodeParser.GCODE_HANDLER['M28'] = GCodeParser.M28_gcode
+GCodeParser.GCODE_HANDLER['M29'] = GCodeParser.M29_gcode
+GCodeParser.GCODE_HANDLER['M30'] = GCodeParser.M30_gcode
+GCodeParser.GCODE_HANDLER['M31'] = GCodeParser.M31_gcode
+GCodeParser.GCODE_HANDLER['M32'] = GCodeParser.M32_gcode
+GCodeParser.GCODE_HANDLER['M42'] = GCodeParser.M42_gcode
+GCodeParser.GCODE_HANDLER['M44'] = GCodeParser.M44_gcode
+GCodeParser.GCODE_HANDLER['M45'] = GCodeParser.M45_gcode
+GCodeParser.GCODE_HANDLER['M46'] = GCodeParser.M46_gcode
+GCodeParser.GCODE_HANDLER['M47'] = GCodeParser.M47_gcode
+GCodeParser.GCODE_HANDLER['M48'] = GCodeParser.M48_gcode
+GCodeParser.GCODE_HANDLER['M73'] = GCodeParser.M73_gcode
+GCodeParser.GCODE_HANDLER['M80'] = GCodeParser.M80_gcode
+GCodeParser.GCODE_HANDLER['M81'] = GCodeParser.M81_gcode
+GCodeParser.GCODE_HANDLER['M82'] = GCodeParser.M82_gcode
+GCodeParser.GCODE_HANDLER['M83'] = GCodeParser.M83_gcode
+GCodeParser.GCODE_HANDLER['M84'] = GCodeParser.M84_gcode
+GCodeParser.GCODE_HANDLER['M85'] = GCodeParser.M85_gcode
+GCodeParser.GCODE_HANDLER['M86'] = GCodeParser.M86_gcode
+GCodeParser.GCODE_HANDLER['M92'] = GCodeParser.M92_gcode
+GCodeParser.GCODE_HANDLER['M104'] = GCodeParser.M104_gcode
+GCodeParser.GCODE_HANDLER['M105'] = GCodeParser.M105_gcode
+GCodeParser.GCODE_HANDLER['M106'] = GCodeParser.M106_gcode
+GCodeParser.GCODE_HANDLER['M107'] = GCodeParser.M107_gcode
+GCodeParser.GCODE_HANDLER['M109'] = GCodeParser.M109_gcode
+GCodeParser.GCODE_HANDLER['M110'] = GCodeParser.M110_gcode
+GCodeParser.GCODE_HANDLER['M112'] = GCodeParser.M112_gcode
+GCodeParser.GCODE_HANDLER['M113'] = GCodeParser.M113_gcode
+GCodeParser.GCODE_HANDLER['M114'] = GCodeParser.M114_gcode
+GCodeParser.GCODE_HANDLER['M115'] = GCodeParser.M115_gcode
+GCodeParser.GCODE_HANDLER['M117'] = GCodeParser.M117_gcode
+GCodeParser.GCODE_HANDLER['M119'] = GCodeParser.M119_gcode
+GCodeParser.GCODE_HANDLER['M120'] = GCodeParser.M120_gcode
+GCodeParser.GCODE_HANDLER['M121'] = GCodeParser.M121_gcode
+GCodeParser.GCODE_HANDLER['M123'] = GCodeParser.M123_gcode
+GCodeParser.GCODE_HANDLER['M125'] = GCodeParser.M125_gcode
+GCodeParser.GCODE_HANDLER['M140'] = GCodeParser.M140_gcode
+GCodeParser.GCODE_HANDLER['M150'] = GCodeParser.M150_gcode
+GCodeParser.GCODE_HANDLER['M155'] = GCodeParser.M155_gcode
+GCodeParser.GCODE_HANDLER['M190'] = GCodeParser.M190_gcode
+GCodeParser.GCODE_HANDLER['M200'] = GCodeParser.M200_gcode
+GCodeParser.GCODE_HANDLER['M201'] = GCodeParser.M201_gcode
+GCodeParser.GCODE_HANDLER['M203'] = GCodeParser.M203_gcode
+GCodeParser.GCODE_HANDLER['M204'] = GCodeParser.M204_gcode
+GCodeParser.GCODE_HANDLER['M205'] = GCodeParser.M205_gcode
+GCodeParser.GCODE_HANDLER['M206'] = GCodeParser.M206_gcode
+GCodeParser.GCODE_HANDLER['M207'] = GCodeParser.M207_gcode
+GCodeParser.GCODE_HANDLER['M208'] = GCodeParser.M208_gcode
+GCodeParser.GCODE_HANDLER['M209'] = GCodeParser.M209_gcode
+GCodeParser.GCODE_HANDLER['M218'] = GCodeParser.M218_gcode
+GCodeParser.GCODE_HANDLER['M220'] = GCodeParser.M220_gcode
+GCodeParser.GCODE_HANDLER['M221'] = GCodeParser.M221_gcode
+GCodeParser.GCODE_HANDLER['M226'] = GCodeParser.M226_gcode
+GCodeParser.GCODE_HANDLER['M240'] = GCodeParser.M240_gcode
+GCodeParser.GCODE_HANDLER['M280'] = GCodeParser.M280_gcode
+GCodeParser.GCODE_HANDLER['M300'] = GCodeParser.M300_gcode
+GCodeParser.GCODE_HANDLER['M301'] = GCodeParser.M301_gcode
+GCodeParser.GCODE_HANDLER['M302'] = GCodeParser.M302_gcode
+GCodeParser.GCODE_HANDLER['M303'] = GCodeParser.M303_gcode
+GCodeParser.GCODE_HANDLER['M304'] = GCodeParser.M304_gcode
+GCodeParser.GCODE_HANDLER['M350'] = GCodeParser.M350_gcode
+GCodeParser.GCODE_HANDLER['M350'] = GCodeParser.M350_gcode
+GCodeParser.GCODE_HANDLER['M400'] = GCodeParser.M400_gcode
+GCodeParser.GCODE_HANDLER['M403'] = GCodeParser.M403_gcode
+GCodeParser.GCODE_HANDLER['M500'] = GCodeParser.M500_gcode
+GCodeParser.GCODE_HANDLER['M501'] = GCodeParser.M501_gcode
+GCodeParser.GCODE_HANDLER['M502'] = GCodeParser.M502_gcode
+GCodeParser.GCODE_HANDLER['M503'] = GCodeParser.M503_gcode
+GCodeParser.GCODE_HANDLER['M509'] = GCodeParser.M509_gcode
+GCodeParser.GCODE_HANDLER['M540'] = GCodeParser.M540_gcode
+GCodeParser.GCODE_HANDLER['M600'] = GCodeParser.M600_gcode
+GCodeParser.GCODE_HANDLER['M601'] = GCodeParser.M601_gcode
+GCodeParser.GCODE_HANDLER['M602'] = GCodeParser.M602_gcode
+GCodeParser.GCODE_HANDLER['M603'] = GCodeParser.M603_gcode
+GCodeParser.GCODE_HANDLER['M701'] = GCodeParser.M701_gcode
+GCodeParser.GCODE_HANDLER['M702'] = GCodeParser.M702_gcode
+GCodeParser.GCODE_HANDLER['M851'] = GCodeParser.M851_gcode
+GCodeParser.GCODE_HANDLER['M860'] = GCodeParser.M860_gcode
+GCodeParser.GCODE_HANDLER['M861'] = GCodeParser.M861_gcode
+GCodeParser.GCODE_HANDLER['M861'] = GCodeParser.M861_gcode
+GCodeParser.GCODE_HANDLER['M900'] = GCodeParser.M900_gcode
+GCodeParser.GCODE_HANDLER['M907'] = GCodeParser.M907_gcode
+GCodeParser.GCODE_HANDLER['M908'] = GCodeParser.M908_gcode
+GCodeParser.GCODE_HANDLER['M910'] = GCodeParser.M910_gcode
+GCodeParser.GCODE_HANDLER['M911'] = GCodeParser.M911_gcode
+GCodeParser.GCODE_HANDLER['M912'] = GCodeParser.M912_gcode
+GCodeParser.GCODE_HANDLER['M913'] = GCodeParser.M913_gcode
+GCodeParser.GCODE_HANDLER['M914'] = GCodeParser.M914_gcode
+GCodeParser.GCODE_HANDLER['M915'] = GCodeParser.M915_gcode
+GCodeParser.GCODE_HANDLER['M916'] = GCodeParser.M916_gcode
+GCodeParser.GCODE_HANDLER['M917'] = GCodeParser.M917_gcode
+GCodeParser.GCODE_HANDLER['M918'] = GCodeParser.M918_gcode
+GCodeParser.GCODE_HANDLER['M928'] = GCodeParser.M928_gcode
+
+######## T-Code Handlers #######################################################
+GCodeParser.GCODE_HANDLER['T0'] = GCodeParser.T0_gcode
+GCodeParser.GCODE_HANDLER['T1'] = GCodeParser.T1_gcode
+GCodeParser.GCODE_HANDLER['T2'] = GCodeParser.T2_gcode
+GCodeParser.GCODE_HANDLER['T3'] = GCodeParser.T3_gcode
+GCodeParser.GCODE_HANDLER['T4'] = GCodeParser.T4_gcode
+GCodeParser.GCODE_HANDLER['T5'] = GCodeParser.T5_gcode
+GCodeParser.GCODE_HANDLER['T6'] = GCodeParser.T6_gcode
+GCodeParser.GCODE_HANDLER['T7'] = GCodeParser.T7_gcode
+GCodeParser.GCODE_HANDLER['T8'] = GCodeParser.T8_gcode
+GCodeParser.GCODE_HANDLER['T9'] = GCodeParser.T9_gcode
+GCodeParser.GCODE_HANDLER['T?'] = GCodeParser.T_QUESTION_MARK_gcode
+GCodeParser.GCODE_HANDLER['Tx'] = GCodeParser.Tx_gcode
+GCodeParser.GCODE_HANDLER['Tc'] = GCodeParser.Tc_gcode
+
+######## D-Code Handlers #######################################################
+
+GCodeParser.GCODE_HANDLER['D-1'] = GCodeParser.D_MINUS_1_gcode
+GCodeParser.GCODE_HANDLER['D0'] = GCodeParser.D0_gcode
+GCodeParser.GCODE_HANDLER['D1'] = GCodeParser.D1_gcode
+GCodeParser.GCODE_HANDLER['D2'] = GCodeParser.D2_gcode
+GCodeParser.GCODE_HANDLER['D3'] = GCodeParser.D3_gcode
+GCodeParser.GCODE_HANDLER['D4'] = GCodeParser.D4_gcode
+GCodeParser.GCODE_HANDLER['D5'] = GCodeParser.D5_gcode
+GCodeParser.GCODE_HANDLER['D6'] = GCodeParser.D6_gcode
+GCodeParser.GCODE_HANDLER['D7'] = GCodeParser.D7_gcode
+GCodeParser.GCODE_HANDLER['D8'] = GCodeParser.D8_gcode
+GCodeParser.GCODE_HANDLER['D9'] = GCodeParser.D9_gcode
+GCodeParser.GCODE_HANDLER['D10'] = GCodeParser.D10_gcode
+GCodeParser.GCODE_HANDLER['D12'] = GCodeParser.D12_gcode
+GCodeParser.GCODE_HANDLER['D80'] = GCodeParser.D80_gcode
+GCodeParser.GCODE_HANDLER['D81'] = GCodeParser.D81_gcode
+GCodeParser.GCODE_HANDLER['D106'] = GCodeParser.D106_gcode
+GCodeParser.GCODE_HANDLER['D2130'] = GCodeParser.D2130_gcode
+GCodeParser.GCODE_HANDLER['D9125'] = GCodeParser.D9125_gcode
+
+######## Special Handlers ######################################################
+GCodeParser.GCODE_HANDLER['PRUSA'] = GCodeParser.PRUSA_gcode
+
