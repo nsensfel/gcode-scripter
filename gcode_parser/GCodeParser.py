@@ -40,6 +40,12 @@ class GCodeParser:
 
       return result
 
+   def generate_temporary_tag_instruction_raw_gcode (instr):
+      return ("; [TEMP_TAG] " + instr)
+
+   def generate_permanent_tag_instruction_raw_gcode (instr):
+      return ("; [TEMP_TAG] " + instr)
+
    #############################################################################
    def reset (self):
       self.index = 0
@@ -96,15 +102,15 @@ class GCodeParser:
    def get_next_raw_gcode_line (self):
       return self.gcode[self.index]
 
-   def insert_raw_gcode_after (self, raw_gcode):
+   def insert_raw_gcode_after (self, raw_gcode, offset = 0):
       if (isinstance(raw_gcode, list)):
          self.gcode = (
-            self.gcode[:(self.index + 1)]
+            self.gcode[:(self.index + offset + 1)]
             + raw_gcode
-            + self.gcode[(self.index + 1):]
+            + self.gcode[(self.index + offset + 1):]
          )
       else:
-         self.gcode.insert((self.index + 1), raw_gcode)
+         self.gcode.insert((self.index + offset + 1), raw_gcode)
 
    def delete_next_gcode_line (self):
       del self.gcode[self.index]

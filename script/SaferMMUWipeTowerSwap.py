@@ -1,57 +1,118 @@
-def SaferMMUWipeTowerSwap:
+from ConsoleOut import ConsoleOut
+
+from script.Script import Script
+
+class SaferMMUWipeTowerSwap (Script):
 
    def perform (self, gcode_parser, printer):
-      gcode_line = gcode_parser.get_next_gcode_raw()
+      if (gcode_parser.completed()):
+         return
 
-      if (gcode_line.startswith("T")):
+      gcode_line = gcode_parser.get_next_raw_gcode_line()
+
+      if (
+         gcode_line.startswith("T")
+         and (gcode_line[1] >= '0')
+         and (gcode_line[1] <= '9')
+      ):
          if (self.ignore_next_filament_swap):
             self.ignore_filament_swap = False
             return
 
-         if (printer.has_script_tag("NEXT_SWAP_HANDLED")):
-            printer.remove_script_tag("NEXT_SWAP_HANDLED")
+         if (printer.has_temporary_tag("NEXT_SWAP_HANDLED")):
+            gcode_parser.insert_raw_gcode_after(
+               GCodeParser.generate_temporary_tag_instruction_raw_gcode(
+                  "NEXT_SWAP_HANDLED unset"
+               ),
+               offset = 1
+            )
             self.ignore_filament_swap = True
             return
 
          inserted_gcode_list = []
 
-         gcode_parser.delete_next_gcode()
+         gcode_parser.delete_next_gcode_line()
 
-         (ox, oy, oz) = printer.get_current_location()
-         (max_x, max_y, max_z) = printer.get_print_area_dimensions()
-         is_in_relative_mode = printer.get_is_using_relative_coordinates()
+         (ox, oy, oz) = printer.get_location()
+         (max_x, max_y, max_z) = printer.get_print_area_size()
+         is_in_relative_mode = printer.is_using_relative_coordinates()
 
          tx = max_x
          ty = 0
          tz = oz + 1
 
          if (tz > max_z):
-            raise ...
+            ConsoleOut.error(
+               "Script unable to raise Z axis further. Wants "
+               + str(tz)
+               + " but max is "
+               + str(max_z)
+               + ". Using max instead."
+            )
+
+            tz = max_z
+
+         inserted_gcode_list.add("; SaferMMUWipeTowerSwap - Moving to swap.")
 
          if (is_in_relative_mode):
             inserted_gcode_list.add("G90") # Use absolute positioning
 
-         inserted_gcode_list.add("goto ox, oy, tz")
-         inserted_gcode_list.add("goto tx, ty, tz")
-         inserted_gcode_list.add("; [SCRIPT TAG] NEXT_SWAP_HANDLED")
+         inserted_gcode_list.add("G0 Z" + str(tz) + "; raise head before move.")
+         inserted_gcode_list.add(
+            "G0"
+            + " X" + str(tx)
+            + " Y" + str(ty)
+            + "; Go to safe location."
+         )
+
+         inserted_gcode_list.add(
+               GCodeParser.generate_temporary_tag_instruction_raw_gcode(
+                  "NEXT_SWAP_HANDLED set"
+               )
+         )
+
          inserted_gcode_list.add(gcode_line)
-         inserted_gcode_list.add("goto ox, oy, tz")
-         inserted_gcode_list.add("goto ox, oy, oz")
+
+         inserted_gcode_list.add(
+            "G0"
+            + " X" + str(ox)
+            + " Y" + str(oy)
+            + "; Return to previous location, with Z still high."
+         )
+         inserted_gcode_list.add(
+            "G0"
+            + " Z" + str(oz)
+            + "; Return to previous Z height."
+         )
 
          if (is_in_relative_mode):
             inserted_gcode_list.add("G91") # Restore relative positioning
 
+         inserted_gcode_list.add("; SaferMMUWipeTowerSwap - Completed swap.")
+
          gcode_parser.insert_raw_gcode_after(inserted_gcode_list)
+         self.replaced_swaps += 1
 
    def __init__ (self):
-      # Ignore the first filament loading.
+      self.replaced_swaps = 0
       self.ignore_next_filament_swap = True
 
    def initial_state (self, gcode_parser, printer):
-      self.perform(gcode_parser, printer):
+      ConsoleOut.standard("Running SaferMMUWipeTowerSwap - Initial State")
+      self.perform(gcode_parser, printer)
 
    def final_state (self, gcode_parser, printer):
-      # Do Nothing
+      ConsoleOut.standard(
+         "Running SaferMMUWipeTowerSwap - Final State reached after "
+         + str(self.replaced_swaps)
+         + " replaced swaps."
+      )
+
+   def is_requesting_rerun (self):
+      return False
+
+   def uses_previous_printer (self):
+      return False
 
    def step (self, previous_printer, gcode_parser, new_printer):
-      self.perform(gcode_parser, new_printer):
+      self.perform(gcode_parser, new_printer)
