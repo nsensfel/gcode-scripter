@@ -56,6 +56,16 @@ class TagCollection (dict):
          )
          return
 
+   def deepcopy (self):
+      result = TagCollection()
+
+      for key in self:
+         result[key] = (
+            self[key].copy() if isinstance(self[key], list) else self[key]
+         )
+
+      return result
+
 class Printer:
    def reset (self):
       self.bed_temperature = 0
@@ -69,7 +79,7 @@ class Printer:
       self.print_area_size_z = 0
       self.print_fan_speed = 0
       self.is_extruding = False
-      self.is_using_relative_positioning = False
+      self.is_using_relative_positioning_val = False
       self.temporary_tags = TagCollection()
 
    def __init__ (self):
@@ -90,7 +100,7 @@ class Printer:
       result.print_area_size_z = self.print_area_size_z
       result.print_fan_speed = self.print_fan_speed = 0
       result.is_extruding = self.is_extruding
-      result.is_using_relative_positioning = self.is_using_relative_positioning
+      result.is_using_relative_positioning_val = self.is_using_relative_positioning_val
       result.temporary_tags = self.temporary_tags.deepcopy()
       result.permanent_tags = self.permanent_tags.deepcopy()
 
@@ -163,10 +173,10 @@ class Printer:
       return self.is_extruding
 
    def set_is_using_relative_positioning (self, value):
-      self.is_using_relative_positioning = value
+      self.is_using_relative_positioning_val = value
 
    def is_using_relative_positioning (self):
-      return self.is_using_relative_positioning
+      return self.is_using_relative_positioning_val
 
    def set_location (self, x, y, z):
       self.location_x = x

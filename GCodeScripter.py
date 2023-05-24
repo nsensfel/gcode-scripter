@@ -1,6 +1,7 @@
 #!/bin/env python3
 import importlib
 import os
+import inspect
 
 from gcode_parser.GCodeParser import GCodeParser
 from printer.Printer import Printer
@@ -131,13 +132,24 @@ class GCodeScripter:
                      for candidate in candidates
                   ]
 
+      result = (
+         GCodeScripter.load_class(
+            name,
+            GCodeScripter.SCRIPT_CLASS_FOLDERS,
+            Script,
+            silent_fail = False
+         )
+      )
+
+      return result
+
    #############################################################################
    def __init__ (self):
       self.gcode_parser = GCodeParser()
       self.printer = Printer()
 
    def set_gcode (self, gcode):
-      self.gcode_parser.parse(gcode)
+      self.gcode_parser.set_raw_gcode_lines(gcode)
 
    def get_gcode (self):
       return self.gcode_parser.get_raw_gcode_instruction_list()
@@ -164,6 +176,14 @@ class GCodeScripter:
       elif (isinstance(script, str)):
          self.execute(GCodeScripter.load_script_classes(script))
 
+         return
+
+      elif (not inspect.isclass(script)):
+         ConsoleOut.error(
+            "Cannot execute \""
+            + str(script)
+            + "\". It is not a class."
+         )
          return
 
       elif (not issubclass(script, Script)):

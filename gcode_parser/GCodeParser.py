@@ -1,3 +1,5 @@
+from ConsoleOut import ConsoleOut
+
 class GCodeParser:
    GCODE_HANDLER = dict()
 
@@ -12,23 +14,23 @@ class GCodeParser:
       if (1 in line):
          result_comment = line[1]
 
-      line = line[0].trim()
+      line = line[0].strip()
 
       if (line.startswith(';')):
          result_comment = line[1:]
       else:
-         line = line.split('0', 1)
-         result_instruction = line[0].trim()
+         line = line.split(' ', 1)
+         result_instruction = line[0].strip()
 
-         if (1 in line):
-            result_params = line[1].trim()
+         if (len(line) > 1):
+            result_params = line[1].strip()
 
       return (result_instruction, result_params, result_comment)
 
    def split_basic_gcode_parameters (arguments):
       result = dict()
 
-      arguments.split(' ')
+      arguments = arguments.split(' ')
 
       for argument in arguments:
          if len(argument) == 1:
@@ -47,29 +49,35 @@ class GCodeParser:
 
       self.reset()
 
+   def set_raw_gcode_lines (self, gcode):
+      self.gcode = gcode
+
+      self.reset()
+
    def get_raw_gcode_lines (self):
       return self.gcode
 
    def load_raw_gcode_lines (self, gcode):
       self.gcode = gcode
 
-
    def step (self, printer):
       if (self.completed()):
          return
 
       (instruction, params, comment) = (
-         parse_raw_gcode_line(self.gcode[self.index])
+         GCodeParser.parse_raw_gcode_line(self.gcode[self.index])
       )
 
       if (len(instruction) > 0):
-         fun = GCodeParser.GCODE_HANDLER[instruction]
-
-         if (fun is None):
+         try:
+            fun = GCodeParser.GCODE_HANDLER[instruction]
+         except KeyError:
             ConsoleOut.warning(
                "G-Code parser met unknown instruction \""
                + instruction
-               + "\""
+               + "\" in \""
+               + self.gcode[self.index]
+               + "\"."
             )
          else:
             fun(self, params, comment, printer)
@@ -241,7 +249,7 @@ class GCodeParser:
 
    # Set Extruder Temperature
    def M104_gcode (self, parameters, comment, printer):
-      param = GCodeParser.split_basic_gcode_parameters(parameter)
+      param = GCodeParser.split_basic_gcode_parameters(parameters)
 
       if ('S' in param):
          printer.set_hotend_temperature(int(param['S']))
@@ -252,10 +260,10 @@ class GCodeParser:
 
    # Fan On
    def M106_gcode (self, parameters, comment, printer):
-      param = GCodeParser.split_basic_gcode_parameters(parameter)
+      param = GCodeParser.split_basic_gcode_parameters(parameters)
 
       if ('S' in param):
-         printer.set_print_fan_speed(int(param['S']))
+         printer.set_print_fan_speed(float(param['S']))
       else:
          printer.set_print_fan_speed(255)
 
@@ -265,10 +273,10 @@ class GCodeParser:
 
    # Set Extruder Temperature and Wait
    def M109_gcode (self, parameters, comment, printer):
-      param = GCodeParser.split_basic_gcode_parameters(parameter)
+      param = GCodeParser.split_basic_gcode_parameters(parameters)
 
       if ('R' in param):
-         printer.set_hotend_temperature(int(param['S']))
+         printer.set_hotend_temperature(int(param['R']))
       elif (('B' in param) and ('S' in param)):
          printer.set_hotend_temperature(int(param['B']))
       elif ('S' in param):
@@ -276,7 +284,7 @@ class GCodeParser:
 
    # Set Current Line Number
    def M110_gcode (self, parameters, comment, printer):
-      param = GCodeParser.split_basic_gcode_parameters(parameter)
+      param = GCodeParser.split_basic_gcode_parameters(parameters)
 
       # Will be incremented right after handling.
       self.line = int(param['S']) - 1
@@ -323,7 +331,7 @@ class GCodeParser:
 
    # Set Bed Temperation (Fast)
    def M140_gcode (self, parameters, comment, printer):
-      param = GCodeParser.split_basic_gcode_parameters(parameter)
+      param = GCodeParser.split_basic_gcode_parameters(parameters)
 
       if ('S' in param):
          printer.set_bed_temperature(int(param['S']))
@@ -338,7 +346,7 @@ class GCodeParser:
 
    # Set Bed Temperature and Wait
    def M190_gcode (self, parameters, comment, printer):
-      param = GCodeParser.split_basic_gcode_parameters(parameter)
+      param = GCodeParser.split_basic_gcode_parameters(parameters)
 
       if ('R' in param):
          printer.set_bed_temperature(int(param['S']))
@@ -699,7 +707,7 @@ class GCodeParser:
    def G0_gcode (self, parameters, comment, printer):
       printer.set_is_extruding(False)
 
-      param = GCodeParser.split_basic_gcode_parameters(parameter)
+      param = GCodeParser.split_basic_gcode_parameters(parameters)
 
       (x, y, z) = printer.get_location()
 
@@ -720,7 +728,7 @@ class GCodeParser:
    def G1_gcode (self, parameters, comment, printer):
       printer.set_is_extruding(True)
 
-      param = GCodeParser.split_basic_gcode_parameters(parameter)
+      param = GCodeParser.split_basic_gcode_parameters(parameters)
 
       (x, y, z) = printer.get_location()
 
@@ -741,7 +749,7 @@ class GCodeParser:
    def G2_gcode (self, parameters, comment, printer):
       printer.set_is_extruding(True)
 
-      param = GCodeParser.split_basic_gcode_parameters(parameter)
+      param = GCodeParser.split_basic_gcode_parameters(parameters)
 
       (x, y, z) = printer.get_location()
 
@@ -762,7 +770,7 @@ class GCodeParser:
    def G3_gcode (self, parameters, comment, printer):
       printer.set_is_extruding(True)
 
-      param = GCodeParser.split_basic_gcode_parameters(parameter)
+      param = GCodeParser.split_basic_gcode_parameters(parameters)
 
       (x, y, z) = printer.get_location()
 
@@ -871,7 +879,7 @@ class GCodeParser:
    # Set Position (defines current location, does not move)
    def G92_gcode (self, parameters, comment, printer):
       # FIXME: Don't know how to handle that.
-      param = GCodeParser.split_basic_gcode_parameters(parameter)
+      param = GCodeParser.split_basic_gcode_parameters(parameters)
 
       (x, y, z) = printer.get_location()
 
