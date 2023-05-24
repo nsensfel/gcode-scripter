@@ -74,9 +74,9 @@ class Printer:
       self.location_x = 0
       self.location_y = 0
       self.location_z = 0
-      self.print_area_size_x = 0
-      self.print_area_size_y = 0
-      self.print_area_size_z = 0
+      self.print_area_size_x = 200
+      self.print_area_size_y = 200
+      self.print_area_size_z = 200
       self.print_fan_speed = 0
       self.is_extruding = False
       self.is_using_relative_positioning_val = False
@@ -198,9 +198,9 @@ class Printer:
 
    def get_print_area_size (self):
       return (
-         self.location_x,
-         self.location_y,
-         self.location_z
+         self.print_area_size_x,
+         self.print_area_size_y,
+         self.print_area_size_z
       )
 
    def get_permanent_tag (self, name):

@@ -152,10 +152,10 @@ class GCodeScripter:
       self.gcode_parser.set_raw_gcode_lines(gcode)
 
    def get_gcode (self):
-      return self.gcode_parser.get_raw_gcode_instruction_list()
+      return self.gcode_parser.get_raw_gcode_lines()
 
    def set_gcode_parser (self, gcode_parser):
-      gcode_parser.parse(self.gcode_parser.get_raw_gcode_instruction_list())
+      gcode_parser.load_raw_gcode_lines(self.gcode_parser.get_raw_gcode_lines())
 
       self.gcode_parser = gcode_parser
 
@@ -370,13 +370,17 @@ if __name__ == "__main__":
 
    if (parsed_arguments.input_file is not None):
       with open(parsed_arguments.input_file[0]) as input_file:
-         gcode_scripter.set_gcode(input_file.readlines())
+         gcode_scripter.set_gcode(
+            [line[:-1] for line in input_file.readlines()]
+         )
 
    if (parsed_arguments.execute is not None):
       gcode_scripter.execute(parsed_arguments.execute)
 
    if (parsed_arguments.output_file is not None):
       with open(parsed_arguments.output_file[0], 'w') as output_file:
-         output_file.writelines(gcode_scripter.get_gcode())
+         output_file.writelines(
+            [(line + "\n") for line in gcode_scripter.get_gcode()]
+         )
 
    ConsoleOut.close()

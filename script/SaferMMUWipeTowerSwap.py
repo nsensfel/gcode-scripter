@@ -1,6 +1,7 @@
 from ConsoleOut import ConsoleOut
 
 from script.Script import Script
+from gcode_parser.GCodeParser import GCodeParser
 
 class SaferMMUWipeTowerSwap (Script):
 
@@ -16,7 +17,7 @@ class SaferMMUWipeTowerSwap (Script):
          and (gcode_line[1] <= '9')
       ):
          if (self.ignore_next_filament_swap):
-            self.ignore_filament_swap = False
+            self.ignore_next_filament_swap = False
             return
 
          if (printer.has_temporary_tag("NEXT_SWAP_HANDLED")):
@@ -26,7 +27,7 @@ class SaferMMUWipeTowerSwap (Script):
                ),
                offset = 1
             )
-            self.ignore_filament_swap = True
+            self.ignore_next_filament_swap = True
             return
 
          inserted_gcode_list = []
@@ -35,7 +36,7 @@ class SaferMMUWipeTowerSwap (Script):
 
          (ox, oy, oz) = printer.get_location()
          (max_x, max_y, max_z) = printer.get_print_area_size()
-         is_in_relative_mode = printer.is_using_relative_coordinates()
+         is_in_relative_mode = printer.is_using_relative_positioning()
 
          tx = max_x
          ty = 0
@@ -52,45 +53,48 @@ class SaferMMUWipeTowerSwap (Script):
 
             tz = max_z
 
-         inserted_gcode_list.add("; SaferMMUWipeTowerSwap - Moving to swap.")
+         inserted_gcode_list.append("; SaferMMUWipeTowerSwap - Moving to swap.")
 
          if (is_in_relative_mode):
-            inserted_gcode_list.add("G90") # Use absolute positioning
+            inserted_gcode_list.append("G90") # Use absolute positioning
 
-         inserted_gcode_list.add("G0 Z" + str(tz) + "; raise head before move.")
-         inserted_gcode_list.add(
+         inserted_gcode_list.append("G0 Z" + str(tz) + "; raise head before move.")
+         inserted_gcode_list.append(
             "G0"
             + " X" + str(tx)
             + " Y" + str(ty)
             + "; Go to safe location."
          )
 
-         inserted_gcode_list.add(
-               GCodeParser.generate_temporary_tag_instruction_raw_gcode(
-                  "NEXT_SWAP_HANDLED set"
-               )
+         inserted_gcode_list.append(
+            GCodeParser.generate_temporary_tag_instruction_raw_gcode(
+               "NEXT_SWAP_HANDLED set"
+            )
          )
 
-         inserted_gcode_list.add(gcode_line)
+         inserted_gcode_list.append(gcode_line)
 
-         inserted_gcode_list.add(
+         inserted_gcode_list.append(
             "G0"
             + " X" + str(ox)
             + " Y" + str(oy)
             + "; Return to previous location, with Z still high."
          )
-         inserted_gcode_list.add(
+         inserted_gcode_list.append(
             "G0"
             + " Z" + str(oz)
             + "; Return to previous Z height."
          )
 
          if (is_in_relative_mode):
-            inserted_gcode_list.add("G91") # Restore relative positioning
+            inserted_gcode_list.append("G91") # Restore relative positioning
 
-         inserted_gcode_list.add("; SaferMMUWipeTowerSwap - Completed swap.")
+         inserted_gcode_list.append("; SaferMMUWipeTowerSwap - Completed swap.")
 
          gcode_parser.insert_raw_gcode_after(inserted_gcode_list)
+
+         ConsoleOut.standard("Handled a tool change.")
+
          self.replaced_swaps += 1
 
    def __init__ (self):

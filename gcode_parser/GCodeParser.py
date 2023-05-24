@@ -11,7 +11,7 @@ class GCodeParser:
 
       line = line.split(';', 1)
 
-      if (1 in line):
+      if (len(line) > 1):
          result_comment = line[1]
 
       line = line[0].strip()
@@ -44,7 +44,7 @@ class GCodeParser:
       return ("; [TEMP_TAG] " + instr)
 
    def generate_permanent_tag_instruction_raw_gcode (instr):
-      return ("; [TEMP_TAG] " + instr)
+      return ("; [PERMA_TAG] " + instr)
 
    #############################################################################
    def reset (self):
@@ -74,7 +74,7 @@ class GCodeParser:
          GCodeParser.parse_raw_gcode_line(self.gcode[self.index])
       )
 
-      if (len(instruction) > 0):
+      if (instruction is not None):
          try:
             fun = GCodeParser.GCODE_HANDLER[instruction]
          except KeyError:
@@ -105,12 +105,12 @@ class GCodeParser:
    def insert_raw_gcode_after (self, raw_gcode, offset = 0):
       if (isinstance(raw_gcode, list)):
          self.gcode = (
-            self.gcode[:(self.index + offset + 1)]
+            self.gcode[:(self.index + offset)]
             + raw_gcode
-            + self.gcode[(self.index + offset + 1):]
+            + self.gcode[(self.index + offset):]
          )
       else:
-         self.gcode.insert((self.index + offset + 1), raw_gcode)
+         self.gcode.insert((self.index + offset), raw_gcode)
 
    def delete_next_gcode_line (self):
       del self.gcode[self.index]
@@ -123,6 +123,9 @@ class GCodeParser:
 
    ##### Comment Handlers ######################################################
    def comment_handler (self, parameters, comment, printer):
+      if (comment is None):
+         return
+
       if (comment.startswith(" [TEMP_TAG] ")):
          printer.interpret_temporary_tag_instruction(
             comment[len(" [TEMP_TAG] "):]
