@@ -4,7 +4,7 @@ from script.Script import Script
 
 class TestScript(Script):
 
-   def __init__ (self):
+   def __init__ (self, params):
       self.step_counter = 0
       self.max_z = 0
 

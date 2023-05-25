@@ -20,6 +20,10 @@ class SaferMMUWipeTowerSwap (Script):
             self.ignore_next_filament_swap = False
             return
 
+         # Pretty sure just setting 
+         # self.ignore_next_filament_swap = True
+         # would be enough there, but let's use the script tags, so it showcases
+         # them.
          if (printer.has_temporary_tag("NEXT_SWAP_HANDLED")):
             gcode_parser.insert_raw_gcode_after(
                GCodeParser.generate_temporary_tag_instruction_raw_gcode(
@@ -37,9 +41,9 @@ class SaferMMUWipeTowerSwap (Script):
          (max_x, max_y, max_z) = printer.get_print_area_size()
          is_in_relative_mode = printer.is_using_relative_positioning()
 
-         tx = max_x
-         ty = 0
-         tz = oz + 1
+         tx = self.x_target
+         ty = self.y_target
+         tz = oz + self.z_step
 
          if (tz > max_z):
             ConsoleOut.error(
@@ -96,12 +100,58 @@ class SaferMMUWipeTowerSwap (Script):
 
          self.replaced_swaps += 1
 
-   def __init__ (self):
+   def __init__ (self, params):
       self.replaced_swaps = 0
       self.ignore_next_filament_swap = True
 
+      self.x_target = None
+      self.y_target = 0
+      self.z_step = 1
+
+      for param in params:
+         if (param[0] == "SMMUWTS_TARGET_X"):
+            self.x_target = float(param[1])
+         elif (param[0] == "SMMUWTS_TARGET_Y"):
+            self.y_target = float(param[1])
+         elif (param[0] == "SMMUWTS_Z_STEP"):
+            self.z_step = float(param[1])
+
    def initial_state (self, gcode_parser, printer):
       ConsoleOut.standard("Running SaferMMUWipeTowerSwap - Initial State")
+
+      (psx, psy, psz) = printer.get_print_area_size()
+
+      if (self.x_target == None):
+         self.x_target = psx
+
+      if (self.x_target > psx):
+         ConsoleOut.error(
+            "SaferMMUWipeTowerSwap is set to target X position \""
+            + str(self.x_target)
+            + "\" but the print area is defined with a max X value of \""
+            + str(psx)
+            + "\"."
+         )
+
+      if (self.y_target > psy):
+         ConsoleOut.error(
+            "SaferMMUWipeTowerSwap is set to target Y position \""
+            + str(self.y_target)
+            + "\" but the print area is defined with a max Y value of \""
+            + str(psy)
+            + "\"."
+         )
+
+      ConsoleOut.standard(
+         "SaferMMUWipeTowerSwap - Target is (X: "
+         + str(self.x_target)
+         + ", Y: "
+         + str(self.y_target)
+         + "), with Z increased by "
+         + str(self.z_step)
+         + " during move and swap."
+      )
+
       self.perform(gcode_parser, printer)
 
    def final_state (self, gcode_parser, printer):

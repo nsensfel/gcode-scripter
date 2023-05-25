@@ -1,3 +1,5 @@
+from ConsoleOut import ConsoleOut
+
 class TagCollection (dict):
    def handle_text_instruction (self, text):
       instruction = text.split(" ")
@@ -85,6 +87,21 @@ class Printer:
    def __init__ (self):
       self.permanent_tags = TagCollection()
       self.reset()
+
+   def set_parameters (self, params):
+      for param in params:
+         if (param[0] == "MAX_X"):
+            self.print_area_size_x = float(param[1])
+         elif (param[0] == "MAX_Y"):
+            self.print_area_size_y = float(param[1])
+         elif (param[0] == "MAX_Z"):
+            self.print_area_size_z = float(param[1])
+         else:
+            ConsoleOut.error(
+               "Unknown Virtual Printer parameter \""
+               + param[0]
+               + "\"."
+            )
 
    def clone (self):
       result = Printer()

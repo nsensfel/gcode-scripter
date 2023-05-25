@@ -147,6 +147,7 @@ class GCodeScripter:
    def __init__ (self):
       self.gcode_parser = GCodeParser()
       self.printer = Printer()
+      self.scripts_parameters = []
 
    def set_gcode (self, gcode):
       self.gcode_parser.set_raw_gcode_lines(gcode)
@@ -159,8 +160,17 @@ class GCodeScripter:
 
       self.gcode_parser = gcode_parser
 
+   def set_gcode_parser_parameters (self, params):
+      self.gcode_parser.set_parameters(params)
+
    def set_printer (self, printer):
       self.printer = printer
+
+   def set_printer_parameters (self, params):
+      self.printer.set_parameters(params)
+
+   def set_scripts_parameters (self, params):
+      self.scripts_parameters = params
 
    def reset (self):
       self.gcode_parser.reset()
@@ -194,7 +204,7 @@ class GCodeScripter:
          )
          return
 
-      script = script()
+      script = script(self.scripts_parameters)
 
       while True:
          ConsoleOut.set_progress(
@@ -288,34 +298,34 @@ if __name__ == "__main__":
 
    argument_parser.add_argument(
       '-vpa',
-      '--virtual-printer-argument',
+      '--virtual-printer-parameter',
       action='append',
       nargs=2,
       help=(
-         '"NAME" "VALUE" argument to pass the virtual printer.'
-         + ' Use -lvpa PRINTER_NAME to see available arguments.'
+         '"NAME" "VALUE" parameter to pass the virtual printer.'
+         + ' Use -lvpa PRINTER_NAME to see available parameters.'
       )
    )
 
    argument_parser.add_argument(
       '-gpa',
-      '--gcode-parser-argument',
+      '--gcode-parser-parameter',
       action='append',
       nargs=2,
       help=(
-         '"NAME" "VALUE" argument to pass theG-Codeparser.'
-         + ' Use -lgpa GCODE_PARSER_NAME to see available arguments.'
+         '"NAME" "VALUE" parameter to pass the G-Code parser.'
+         + ' Use -lgpa GCODE_PARSER_NAME to see available parameters.'
       )
    )
 
    argument_parser.add_argument(
       '-sa',
-      '--script-argument',
+      '--scripts-parameter',
       action='append',
       nargs=2,
       help=(
-         '"NAME" "VALUE" argument to pass the script.'
-         + ' Use -lsa SCRIPT_FILE to see available arguments.'
+         '"NAME" "VALUE" parameter to pass the scripts.'
+         + ' Use -lsa SCRIPT_FILE to see available parameters.'
       )
    )
 
@@ -367,6 +377,21 @@ if __name__ == "__main__":
       )
 
       gcode_scripter.set_gcode_parser(gcode_parser_class())
+
+   if (parsed_arguments.virtual_printer_parameter is not None):
+      gcode_scripter.set_printer_parameters(
+         parsed_arguments.virtual_printer_parameter
+      )
+
+   if (parsed_arguments.gcode_parser_parameter is not None):
+      gcode_scripter.set_gcode_parser_parameters(
+         parsed_arguments.gcode_parser_parameter
+      )
+
+   if (parsed_arguments.scripts_parameter is not None):
+      gcode_scripter.set_scripts_parameters(
+         parsed_arguments.scripts_parameter
+      )
 
    if (parsed_arguments.input_file is not None):
       with open(parsed_arguments.input_file[0]) as input_file:

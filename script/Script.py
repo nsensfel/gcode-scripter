@@ -2,7 +2,7 @@ from ConsoleOut import ConsoleOut
 
 class Script:
 
-   def __init__ (self):
+   def __init__ (self, params):
       self.step_counter = 0
 
    def initial_state (self, gcode_parser, printer):

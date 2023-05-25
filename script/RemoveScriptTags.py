@@ -12,7 +12,7 @@ def RemoveScriptTags:
          else:
             break
 
-   def __init__ (self):
+   def __init__ (self, params):
       # Do Nothing
 
    def initial_state (self, gcode_parser, printer):

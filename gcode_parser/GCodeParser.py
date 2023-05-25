@@ -55,6 +55,14 @@ class GCodeParser:
 
       self.reset()
 
+   def set_parameters (self, params):
+      for param in params:
+         ConsoleOut.error(
+            "Unknown G-Code Parser parameter \""
+            + param[0]
+            + "\"."
+         )
+
    def set_raw_gcode_lines (self, gcode):
       self.gcode = gcode
 
